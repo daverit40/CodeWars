@@ -4,10 +4,9 @@ function execute()
     var ttt = new TicTacToe();
 
     console.log(ttt.move()); // -> [5, "Your move?"]
-    console.log(ttt.move()); // -> [3, "Your move?"]
-    console.log(ttt.move()); // -> [9, "Your move?"]
-    console.log(ttt.move()); // -> [4, "Your move?"]
-    console.log(ttt.move()); // -> [0, "Draw!"]
+    console.log(ttt.move(1)); // -> [3, "Your move?"]
+    console.log(ttt.move(4)); // -> [7, "I win!"]
+    console.log(ttt.move(9)); // -> [0, "Game ended"]
 
     //console.log(decodeBits('01110'));
     //decodeMorse('.... . -.--   .--- ..- -.. .');
@@ -60,16 +59,6 @@ function TicTacToe() {
         moveHistory.push(move);
         mover.push(move);
         removePreference(move);
-    }
-
-    this.addMoveHistory = function(value)
-    {
-        moveHistory.push(value);
-    }
-
-    this.getMoveHistory = function()
-    {
-        return moveHistory;
     }
 
     this.playerMove = function(move)
