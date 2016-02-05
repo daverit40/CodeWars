@@ -1,8 +1,187 @@
 ﻿
 function execute()
 {
-    console.log(decodeBits('01110'));
+    var ttt = new TicTacToe();
+
+    console.log(ttt.move()); // -> [5, "Your move?"]
+    console.log(ttt.move()); // -> [3, "Your move?"]
+    console.log(ttt.move()); // -> [9, "Your move?"]
+    console.log(ttt.move()); // -> [4, "Your move?"]
+    console.log(ttt.move()); // -> [0, "Draw!"]
+
+    //console.log(decodeBits('01110'));
     //decodeMorse('.... . -.--   .--- ..- -.. .');
+}
+
+function TicTacToe() {
+    // fill out the construction function
+    var moveHistory = [];
+    var gameState = 1;//
+    var pcMoves = [];
+    var playerMoves = [];
+    var endedState = 0;
+    var errorState = 99;
+    var goodState = 1;
+    var lastMove = '';
+
+    var victoryPossibilities =
+        [
+            "123",
+            "147",
+            "258",
+            "357",
+            "369",
+            "456",
+            "753",
+            "789"
+        ]
+
+    var movePrefernces = [5, 1, 3, 7, 9, 2, 4, 6, 8];
+
+    var returnCodes = {
+        gameEnded: "Game ended",
+        youWin: "You Win",
+        draw: "Draw!",
+        iWin: "I win!",
+        yourMove: "Your Move?",
+        badMove: "Illegal move"
+    }
+
+    function removePreference(val)
+    {
+        movePrefernces = movePrefernces.filter(function (elem, idx, array)
+        {
+            return elem != val;
+        })
+    }
+
+    function addMove(move, mover)
+    {
+        moveHistory.push(move);
+        mover.push(move);
+        removePreference(move);
+    }
+
+    this.addMoveHistory = function(value)
+    {
+        moveHistory.push(value);
+    }
+
+    this.getMoveHistory = function()
+    {
+        return moveHistory;
+    }
+
+    this.playerMove = function(move)
+    {
+        if (gameState != endedState)
+        {
+            if (moveHistory.join('').toString().indexOf(move.toString()) >= 0)
+            {
+                gameState = errorState;
+            }
+            else
+            {
+                gameState = goodState;
+                addMove(move, playerMoves);
+                lastMove = 'player';
+            }
+        }        
+    }
+
+    this.pcMove = function()
+    {        
+        addMove(movePrefernces[0], pcMoves);
+        lastMove = 'pc';
+    }
+
+    this.evaluateGame = function()
+    {        
+        // check if game has ended
+        if(gameState == endedState)
+        {
+            return [0, returnCodes.gameEnded];
+        }
+
+        // check if user errored
+        if (gameState == errorState)
+        {
+            return [0, returnCodes.badMove];
+        }
+
+        // check if player ended game with move
+        if(checkWin(playerMoves))
+        {
+            gameState = endedState;
+            return [0, returnCodes.youWin];
+        }
+
+        //check for draw
+        if (moveHistory.length == 9)
+        {
+            gameState = endedState;
+            return [0, returnCodes.draw];
+        }
+
+        // check for pc win
+        if(checkWin(pcMoves))
+        {
+            gameState = endedState;
+            return [moveHistory[moveHistory.length - 1], returnCodes.iWin];
+        }
+
+        // check if player's turn again
+        if(lastMove == 'pc')
+        {
+            return [moveHistory[moveHistory.length - 1], returnCodes.yourMove];
+        }
+
+        return null;
+        
+    }
+
+    function checkWin(moves)
+    {
+        var win = false;
+        //loop thru each win scenario and check if player won
+        victoryPossibilities.forEach(function (elem, idx, array)
+        {
+            var hitCount = 0; //need 3 to win
+            moves.forEach(function (field, idx, array)
+            {
+                if (elem.indexOf(field.toString()) >=0)
+                {
+                    hitCount += 1;
+                }
+            });
+
+            if (hitCount == 3) { win = true }
+        });
+
+        return win;
+    }
+}
+
+TicTacToe.prototype.move = function (field) {
+    // fill out the move method
+    var ret = [];
+
+    if (field)
+    {
+        //player move
+        this.playerMove(field);
+        ret = this.evaluateGame();
+
+        if (ret)
+        {
+            return ret;
+        }
+    }
+
+    this.pcMove(field);
+
+    return this.evaluateGame();
+
 }
 
 var decodeBits = function (bits) {
